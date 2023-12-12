@@ -6,8 +6,8 @@ Parser/Serializer tools for Fluent Syntax.
 version = "0.11.0"
 edition = "2021"
 authors = [
-    "Zibi Braniecki <gandalf@mozilla.com>",
-    "Staś Małolepszy <stas@mozilla.com>"
+	"Zibi Braniecki <gandalf@mozilla.com>",
+	"Staś Małolepszy <stas@mozilla.com>",
 ]
 homepage = "http://www.projectfluent.org"
 license = "Apache-2.0/MIT"
@@ -21,13 +21,14 @@ include = [
 	"Cargo.toml",
 	"README.md",
 	"LICENSE-APACHE",
-	"LICENSE-MIT"
+	"LICENSE-MIT",
 ]
 
 [dependencies]
 serde = { workspace = true, optional = true, features = ["derive"] }
 serde_json = { workspace = true, optional = true }
 thiserror.workspace = true
+yoke.workspace = true
 
 [dev-dependencies]
 criterion.workspace = true

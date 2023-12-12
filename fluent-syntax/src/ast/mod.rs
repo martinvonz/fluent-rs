@@ -86,8 +86,11 @@
 //! canonical form of the AST is suitable for a round-trip.
 mod helper;
 
+use std::mem;
+
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+use yoke::Yokeable;
 
 /// Root node of a Fluent Translation List.
 ///
@@ -115,6 +118,31 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Resource<S> {
     pub body: Vec<Entry<S>>,
+}
+
+unsafe impl<'a> Yokeable<'a> for Resource<&'static str> {
+    type Output = Resource<&'a str>;
+
+    fn transform(&'a self) -> &'a Self::Output {
+        self
+    }
+
+    fn transform_owned(self) -> Self::Output {
+        self
+    }
+
+    unsafe fn make(from: Self::Output) -> Self {
+        mem::transmute(from)
+    }
+
+    fn transform_mut<F>(&'a mut self, f: F)
+    where
+        // be VERY CAREFUL changing this signature, it is very nuanced (see above)
+        F: 'static + for<'b> FnOnce(&'b mut Self::Output),
+    {
+        // Cast away the lifetime of Self
+        unsafe { f(mem::transmute::<&'a mut Self, &'a mut Self::Output>(self)) }
+    }
 }
 
 /// A top-level node representing an entry of a [`Resource`].

@@ -7,12 +7,10 @@ members = [
     "fluent-pseudo",
     "fluent-testing",
     "fluent",
-    "intl-memoizer"
+    "intl-memoizer",
 ]
 
-exclude = [
-    "fluent-cli",
-]
+exclude = ["fluent-cli"]
 
 [workspace.dependencies]
 criterion = "0.3"
@@ -26,6 +24,7 @@ serde_json = "1.0"
 thiserror = "1.0"
 tokio = "1.0"
 unic-langid = "0.9"
+yoke = "0.7.3"
 
 fluent-bundle = { path = "fluent-bundle" }
 fluent-fallback = { path = "fluent-fallback" }

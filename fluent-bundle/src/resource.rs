@@ -1,20 +1,10 @@
 use fluent_syntax::ast;
 use fluent_syntax::parser::{parse_runtime, ParserError};
-
-use self_cell::self_cell;
+use yoke::Yoke;
 
 type Resource<'s> = ast::Resource<&'s str>;
 
-self_cell!(
-    pub struct InnerFluentResource {
-        owner: String,
-
-        #[covariant]
-        dependent: Resource,
-    }
-
-    impl {Debug}
-);
+type InnerFluentResource = Yoke<Resource<'static>, String>;
 
 /// A resource containing a list of localization messages.
 ///
@@ -82,13 +72,14 @@ impl FluentResource {
     pub fn try_new(source: String) -> Result<Self, (Self, Vec<ParserError>)> {
         let mut errors = None;
 
-        let res = InnerFluentResource::new(source, |source| match parse_runtime(source.as_str()) {
-            Ok(ast) => ast,
-            Err((ast, err)) => {
-                errors = Some(err);
-                ast
-            }
-        });
+        let res =
+            InnerFluentResource::attach_to_cart(source, |source| match parse_runtime(source) {
+                Ok(ast) => ast,
+                Err((ast, err)) => {
+                    errors = Some(err);
+                    ast
+                }
+            });
 
         match errors {
             None => Ok(Self(res)),
@@ -115,7 +106,7 @@ impl FluentResource {
     /// );
     /// ```
     pub fn source(&self) -> &str {
-        self.0.borrow_owner()
+        self.0.backing_cart()
     }
 
     /// Returns an iterator over [`entries`](fluent_syntax::ast::Entry) of the [`FluentResource`].
@@ -142,7 +133,7 @@ impl FluentResource {
     /// assert!(matches!(resource.entries().next(), Some(ast::Entry::Message(_))));
     /// ```
     pub fn entries(&self) -> impl Iterator<Item = &ast::Entry<&str>> {
-        self.0.borrow_dependent().body.iter()
+        Yoke::get(&self.0).body.iter()
     }
 
     /// Returns an [`Entry`](fluent_syntax::ast::Entry) at the
@@ -166,6 +157,6 @@ impl FluentResource {
     /// assert!(matches!(resource.get_entry(0), Some(ast::Entry::Message(_))));
     /// ```
     pub fn get_entry(&self, idx: usize) -> Option<&ast::Entry<&str>> {
-        self.0.borrow_dependent().body.get(idx)
+        Yoke::get(&self.0).body.get(idx)
     }
 }
