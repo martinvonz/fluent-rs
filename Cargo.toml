@@ -25,6 +25,7 @@ thiserror = "1.0"
 tokio = "1.0"
 unic-langid = "0.9"
 yoke = "0.7.3"
+yoke-derive = "0.7.3"
 
 fluent-bundle = { path = "fluent-bundle" }
 fluent-fallback = { path = "fluent-fallback" }

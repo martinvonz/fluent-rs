@@ -29,6 +29,7 @@ serde = { workspace = true, optional = true, features = ["derive"] }
 serde_json = { workspace = true, optional = true }
 thiserror.workspace = true
 yoke.workspace = true
+yoke-derive.workspace = true
 
 [dev-dependencies]
 criterion.workspace = true
